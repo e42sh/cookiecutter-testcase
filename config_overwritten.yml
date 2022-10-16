@@ -1,0 +1,4 @@
+default_context:
+  name: uiui-overwritten
+  var_yes: yes
+  var_no: no

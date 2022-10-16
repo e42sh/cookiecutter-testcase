@@ -1,0 +1,53 @@
+name: tests-actions
+run-name: Testing
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cookiecutter-version: [ "1.7.3", "2.1.1" ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install 'cookiecutter==${{ matrix.cookiecutter-version }}'
+      - run: cookiecutter --version
+      - run: |
+          cookiecutter -v \
+            -f \
+            --no-input \
+            --config-file config.yml \
+            --output-dir /tmp \
+            .
+      - name: "Result of variable when not overwritten via config yml"
+        run: |
+          echo "YML config used for cookiecutter template"
+          cat config.yml
+          echo 
+          echo "Result in generated file"
+          cat /tmp/uiui/generated.yml
+      - run: |
+          cookiecutter -v \
+            -f \
+            --no-input \
+            --config-file config_overwritten.yml \
+            --debug-file cookiecutter-${{ matrix.cookiecutter-version }}.txt \
+            --output-dir /tmp \
+            .
+      - name: "Result of variable when overwritten via config yml"
+        run: |
+          echo "YML config used for cookiecutter template"
+          cat config_overwritten.yml
+          echo 
+          echo "Resulting generated file"
+          cat /tmp/uiui-overwritten/generated.yml
+      - name: Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: archive-${{ matrix.cookiecutter-version }}
+          path: |
+            /tmp/uiui
+            /tmp/uiui-overwritten
+            cookiecutter-${{ matrix.cookiecutter-version }}.txt

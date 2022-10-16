@@ -1,0 +1,3 @@
+---
+var_yes: {{ cookiecutter.var_yes }}
+var_no: {{ cookiecutter.var_no }}
